@@ -1,0 +1,27 @@
+@use "../tokens";
+
+.tab-list {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  padding: tokens.$spacing-3xs tokens.$spacing-3xs tokens.$spacing-2xs;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+
+.tab-list--pill {
+  gap: tokens.$spacing-xs;
+
+  @media (max-width: tokens.$breakpoint-mobile) {
+    gap: tokens.$spacing-2xs;
+  }
+}
+
+.tab-list--underline {
+  gap: tokens.$spacing-xl;
+
+  @media (max-width: tokens.$breakpoint-mobile) {
+    gap: tokens.$spacing-l;
+  }
+}

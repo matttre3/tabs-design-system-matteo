@@ -1,0 +1,113 @@
+@use "../mixins/typography";
+@use "../tokens";
+
+.tab {
+  min-height: 3.125rem;
+  padding: tokens.$spacing-0 tokens.$spacing-s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: tokens.$spacing-2xs;
+  box-sizing: border-box;
+  color: tokens.$color-on-neutral;
+  font-weight: tokens.$font-weight-bold;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+
+  @include typography.body-m;
+
+  @media (max-width: tokens.$breakpoint-mobile) {
+    min-height: 2.625rem;
+    padding-inline: tokens.$spacing-xs;
+  }
+}
+
+.tab--pill {
+  border: 1px solid tokens.$color-outline-default;
+  border-radius: tokens.$radius-full;
+  background-color: transparent;
+}
+
+.tab--pill[aria-selected="true"] {
+  border-color: transparent;
+  background-color: tokens.$color-inverse;
+  color: tokens.$color-content-inverse;
+}
+
+.tab--pill:not([aria-selected="true"]):hover {
+  border-color: tokens.$color-outline-hover;
+  background-color: tokens.$color-surface-hover;
+}
+
+.tab--pill[aria-selected="true"]:hover {
+  background-color: tokens.$color-inverse-hover;
+}
+
+.tab--pill:not([aria-selected="true"]):active {
+  border-color: tokens.$color-outline-default;
+  background-color: tokens.$color-surface-active;
+}
+
+.tab--pill[aria-selected="true"]:active {
+  background-color: tokens.$color-inverse-active;
+}
+
+.tab--pill:focus-visible {
+  outline: 2px solid tokens.$color-focus-ring;
+  outline-offset: 2px;
+  background-color: transparent;
+}
+
+.tab--pill[aria-selected="true"]:focus-visible {
+  outline-color: tokens.$color-inverse;
+  background-color: tokens.$color-inverse;
+}
+
+.tab--underline {
+  position: relative;
+  padding: tokens.$spacing-0 tokens.$spacing-0 0.1875rem;
+  border: 0;
+  border-radius: tokens.$radius-small;
+  background-color: transparent;
+}
+
+.tab--underline::after {
+  position: absolute;
+  bottom: tokens.$spacing-4xs;
+  inset-inline: tokens.$spacing-4xs;
+  height: 0.1875rem;
+  border-radius: tokens.$radius-full;
+  background-color: transparent;
+  content: "";
+  transition: background-color 150ms ease;
+}
+
+.tab--underline[aria-selected="true"]::after,
+.tab--underline[aria-selected="true"]:hover::after,
+.tab--underline[aria-selected="true"]:active::after {
+  background-color: tokens.$color-inverse;
+}
+
+.tab--underline:not([aria-selected="true"]):hover::after,
+.tab--underline:not([aria-selected="true"]):active::after,
+.tab--underline:not([aria-selected="true"]):focus-visible::after {
+  background-color: tokens.$color-outline-hover;
+}
+
+.tab--underline:focus-visible {
+  outline: 2px solid tokens.$color-inverse;
+  outline-offset: 2px;
+}
+
+.tab--underline[aria-selected="true"]:focus-visible::after {
+  background-color: tokens.$color-inverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .tab--underline::after {
+    transition: none;
+  }
+}

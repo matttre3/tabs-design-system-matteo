@@ -1,0 +1,30 @@
+@use "../mixins/typography";
+@use "../tokens";
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: tokens.$spacing-3xs tokens.$spacing-2xs;
+  border-radius: tokens.$radius-medium;
+  color: tokens.$color-on-neutral;
+  font-weight: tokens.$font-weight-bold;
+
+  @include typography.body-s;
+
+  @media (max-width: tokens.$breakpoint-mobile) {
+    padding: tokens.$spacing-4xs tokens.$spacing-3xs;
+    border-radius: tokens.$radius-small;
+  }
+}
+
+.badge--positive {
+  background-color: tokens.$badge-positive-background;
+}
+
+.badge--neutral {
+  background-color: tokens.$badge-neutral-background;
+}
+
+.badge--negative {
+  background-color: tokens.$badge-negative-background;
+}

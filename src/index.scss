@@ -1,0 +1,22 @@
+@use "./styles/tokens";
+
+body {
+  font-family: tokens.$font-family-body;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.demo {
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: tokens.$spacing-xl tokens.$spacing-s;
+}
+
+.demo-section + .demo-section {
+  margin-block-start: tokens.$spacing-xl;
+}

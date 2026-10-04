@@ -1,0 +1,13 @@
+@use "../tokens";
+
+@mixin body-m {
+  font-size: tokens.$font-size-body-m;
+  font-family: tokens.$font-family-body;
+  line-height: tokens.$line-height-body;
+}
+
+@mixin body-s {
+  font-size: tokens.$font-size-body-s;
+  font-family: tokens.$font-family-body;
+  line-height: tokens.$line-height-body;
+}
