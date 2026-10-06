@@ -3,7 +3,10 @@ import { createContext, useContext } from "react";
 type TabContextType = {
   baseId: string;
   selectedTab: string;
+  tabbableTab: string;
   selectTab: (value: string) => void;
+  registerTab: (value: string, element: HTMLButtonElement) => void;
+  unregisterTab: (element: HTMLButtonElement) => void;
   variant: "pill" | "underline";
 };
 

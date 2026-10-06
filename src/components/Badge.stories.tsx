@@ -19,7 +19,7 @@ const meta = {
       ),
       description: {
         component:
-          "Badge is informational text, not an interactive control. It can be used on its own or through Tab's badge prop. The text should communicate meaning without relying only on color.",
+          "Badge is informational text, not an interactive control. It can be used on its own or through Tab's badge prop. Use accessibleLabel when a short visible label needs more context, and do not rely on color alone to convey meaning.",
       },
     },
   },
@@ -29,6 +29,10 @@ const meta = {
   },
   argTypes: {
     label: { control: "text" },
+    accessibleLabel: {
+      control: "text",
+      description: "Optional meaning announced instead of the visible badge text.",
+    },
     variant: {
       control: "inline-radio",
       options: ["neutral", "positive", "negative"],
@@ -79,6 +83,18 @@ export const LongerLabel: Story = {
     docs: {
       description: {
         story: "A longer text value to check spacing, typography and contrast.",
+      },
+    },
+  },
+};
+
+export const AccessibleCount: Story = {
+  args: { label: "3", variant: "negative", accessibleLabel: "3 orders awaiting review" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The visible badge stays short, while assistive technology receives the count with its meaning.",
       },
     },
   },

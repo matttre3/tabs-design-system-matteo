@@ -28,6 +28,34 @@ function Example({
 }
 
 describe("Tabs", () => {
+  it("renders badge variants and gives a count its optional accessible meaning", () => {
+    render(
+      <Tabs defaultValue="all">
+        <TabList aria-label="Orders">
+          <Tab value="all" label="All" badge={{ label: "12" }} />
+          <Tab value="completed" label="Completed" badge={{ label: "4", variant: "positive" }} />
+          <Tab
+            value="review"
+            label="Orders"
+            badge={{ label: "3", variant: "negative", accessibleLabel: "3 awaiting review" }}
+          />
+        </TabList>
+        <TabPanel value="all">All orders</TabPanel>
+        <TabPanel value="completed">Completed orders</TabPanel>
+        <TabPanel value="review">Orders awaiting review</TabPanel>
+      </Tabs>,
+    );
+
+    const all = screen.getByRole("tab", { name: "All 12" });
+    const completed = screen.getByRole("tab", { name: "Completed 4" });
+    const review = screen.getByRole("tab", { name: "Orders 3 awaiting review" });
+
+    expect(within(all).getByText("12")).toHaveClass("badge--neutral");
+    expect(within(completed).getByText("4")).toHaveClass("badge--positive");
+    expect(within(review).getByText("3")).toHaveAttribute("aria-hidden", "true");
+    expect(within(review).getByText("3").parentElement).toHaveClass("badge--negative");
+  });
+
   it("connects each tab to its panel and exposes only the selected panel", () => {
     render(<Example />);
 
@@ -154,5 +182,114 @@ describe("Tabs", () => {
     await user.click(firstActivity);
     expect(firstActivity).toHaveAttribute("aria-selected", "true");
     expect(secondActivity).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("selects the first registered tab when defaultValue does not exist", () => {
+    render(<Example defaultValue="missing" />);
+
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("tabpanel", { name: "Overview" })).toBeVisible();
+  });
+
+  it("selects the next remaining tab and restores focus when the selected tab is removed", () => {
+    const dynamic = (showActivity: boolean) => (
+      <Tabs defaultValue="activity">
+        <TabList aria-label="Dynamic sections">
+          <Tab value="overview" label="Overview" />
+          {showActivity && <Tab value="activity" label="Activity" />}
+          <Tab value="settings" label="Settings" />
+        </TabList>
+        <TabPanel value="overview">Overview content</TabPanel>
+        {showActivity && <TabPanel value="activity">Activity content</TabPanel>}
+        <TabPanel value="settings">Settings content</TabPanel>
+      </Tabs>
+    );
+    const { rerender } = render(dynamic(true));
+
+    screen.getByRole("tab", { name: "Activity" }).focus();
+    rerender(dynamic(false));
+
+    const settings = screen.getByRole("tab", { name: "Settings" });
+    expect(settings).toHaveAttribute("aria-selected", "true");
+    expect(settings).toHaveAttribute("tabindex", "0");
+    expect(settings).toHaveFocus();
+    expect(screen.getByRole("tabpanel", { name: "Settings" })).toBeVisible();
+  });
+
+  it("selects the previous tab when the last selected tab is removed", () => {
+    const dynamic = (showSettings: boolean) => (
+      <Tabs defaultValue="settings">
+        <TabList aria-label="Dynamic sections">
+          <Tab value="overview" label="Overview" />
+          <Tab value="activity" label="Activity" />
+          {showSettings && <Tab value="settings" label="Settings" />}
+        </TabList>
+        <TabPanel value="overview">Overview content</TabPanel>
+        <TabPanel value="activity">Activity content</TabPanel>
+        {showSettings && <TabPanel value="settings">Settings content</TabPanel>}
+      </Tabs>
+    );
+    const { rerender } = render(dynamic(true));
+
+    rerender(dynamic(false));
+
+    expect(screen.getByRole("tab", { name: "Activity" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Activity" })).toBeVisible();
+  });
+
+  it("keeps an invalid controlled value owned by the parent but leaves a tab reachable", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(
+      <Tabs value="missing" onValueChange={onValueChange}>
+        <TabList aria-label="Controlled sections">
+          <Tab value="overview" label="Overview" />
+          <Tab value="activity" label="Activity" />
+        </TabList>
+        <TabPanel value="overview">Overview content</TabPanel>
+        <TabPanel value="activity">Activity content</TabPanel>
+      </Tabs>,
+    );
+
+    const overview = screen.getByRole("tab", { name: "Overview" });
+    expect(overview).toHaveAttribute("tabindex", "0");
+    expect(overview).toHaveAttribute("aria-selected", "false");
+    expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining('controlled value "missing"'));
+
+    await user.tab();
+    expect(overview).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith("activity");
+    warning.mockRestore();
+  });
+
+  it("does not change a controlled value when its tab is removed", () => {
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const onValueChange = vi.fn();
+    const dynamic = (showActivity: boolean) => (
+      <Tabs value="activity" onValueChange={onValueChange}>
+        <TabList aria-label="Controlled sections">
+          <Tab value="overview" label="Overview" />
+          {showActivity && <Tab value="activity" label="Activity" />}
+        </TabList>
+        <TabPanel value="overview">Overview content</TabPanel>
+        {showActivity && <TabPanel value="activity">Activity content</TabPanel>}
+      </Tabs>
+    );
+    const { rerender } = render(dynamic(true));
+
+    screen.getByRole("tab", { name: "Activity" }).focus();
+    rerender(dynamic(false));
+
+    const overview = screen.getByRole("tab", { name: "Overview" });
+    expect(overview).toHaveAttribute("aria-selected", "false");
+    expect(overview).toHaveAttribute("tabindex", "0");
+    expect(overview).toHaveFocus();
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining('controlled value "activity"'));
+    warning.mockRestore();
   });
 });

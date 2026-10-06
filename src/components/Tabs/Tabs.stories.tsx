@@ -59,7 +59,11 @@ const meta = {
   render: ({ variant, defaultValue }) => (
     <Tabs variant={variant} defaultValue={defaultValue ?? "overview"}>
       <TabList aria-label="Account sections">
-        <Tab value="overview" label="Overview" badge={{ label: "3", variant: "neutral" }} />
+        <Tab
+          value="overview"
+          label="Overview"
+          badge={{ label: "3", variant: "neutral", accessibleLabel: "3 unread updates" }}
+        />
         <Tab value="activity" label="Activity" />
         <Tab value="settings" label="Settings" />
       </TabList>
@@ -180,7 +184,7 @@ export const BadgeVariantsInTabs: Story = {
     docs: {
       description: {
         story:
-          "All three Badge variants through the Tab API. The Badge text is part of the button content; verify the resulting accessible name with a screen reader.",
+          "All three Badge variants through the Tab API. When a count needs context, provide badge.accessibleLabel so the Tab's accessible name explains it.",
       },
     },
   },
